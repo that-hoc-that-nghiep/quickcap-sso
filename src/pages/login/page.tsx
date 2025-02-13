@@ -41,20 +41,26 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const redirectUri = searchParams.get("redirect_uri") || window.location.origin;
+      const redirectUri =
+        searchParams.get("redirect_uri") || window.location.origin;
 
-      console.log(redirectUri);
-      const { data } = await instance.post("/auth/login", {
+      const response = await instance.post("/auth/login", {
         provider: "google",
         redirectAfterLogin: redirectUri,
       });
-      console.log(data.data);
+      const data = response.data;
 
       if (data.code === 302) {
         window.location.href = data.url;
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Response error:", error.response.data);
+      } else if (error.request) {
+        console.error("Request error:", error.request);
+      } else {
+        console.error("General error:", error.message);
+      }
     } finally {
       setLoading(false);
     }
